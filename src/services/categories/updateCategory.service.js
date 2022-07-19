@@ -1,19 +1,26 @@
 import database from "../../database";
 
-const updateCategoryService = async ({ category_id, name }) => {
+const updateCategoryService = async (id, newCategorie) => {
   try {
-    const res = await database.query(
-      "UPDATE categories SET name = $1 WHERE id = $2 RETURNING *",
-      [name, category_id]
+    const response = await database.query(
+      `SELECT * FROM categories WHERE id= $1`,
+      [id]
     );
 
-    if (!res.rows.length) {
-      throw new Error("Not found any course with this id");
+    if (response.rowCount === 0) {
+      throw "usuario não encontrado";
     }
+    const update = await database.query(
+      ` UPDATE categories SET name = $1 WHERE id = $2 RETURNING *;`,
+      [newCategorie, id]
+    );
 
-    return res.rows[0];
-  } catch (err) {
-    throw new Error(err.message);
+    return {
+      message: "Category updated",
+      category: update.rows[0],
+    };
+  } catch (error) {
+    throw new Error(error);
   }
 };
 

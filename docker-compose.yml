@@ -1,0 +1,43 @@
+version: "3.3"
+
+services:
+  application:
+    container_name: m4_s4
+    build: .
+    ports:
+      - 4040:4040
+    environment:
+      - DB_USER=rachel
+      - DB_HOST=db
+      - DB_PASSWORD=1234
+      - DB=products_management
+      - DB_PORT=5432
+    depends_on:
+      - db
+
+    volumes:
+      - ./create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+
+  db:
+    container_name: db
+    image: postgres:14.3
+    ports:
+      - 5433:5432
+    environment:
+      - POSTGRES_USER=rachel
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=products_management
+    volumes:
+      - ./create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+
+  db-test:
+    container_name: db-test
+    image: postgres:14.3
+    ports:
+      - 5434:5432
+    environment:
+      - POSTGRES_USER=rachel
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=tests_products
+    volumes:
+      - ./create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql

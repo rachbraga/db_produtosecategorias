@@ -1,38 +1,28 @@
 import database from "../../database";
 
-const updateProductService = async ({
-  product_id,
-  name = "",
-  price = "",
-  category_id = "",
-}) => {
+const updateProductService = async (id, data) => {
   try {
-    if (!name && !price && !category_id) {
-      throw new Error("You need to specify something to be updated.");
-    }
-
-    const res = await database.query("SELECT * FROM products WHERE id = $1", [
-      product_id,
+    const uId = await database.query("SELECT * FROM products WHERE id=$1", [
+      id,
     ]);
 
-    if (!res.rows.length) {
-      throw new Error("Not found any course with this id.");
+    if (uId.rowCount === 0) {
+      throw "Product ID not found.";
     }
 
-    const [product] = res.rows;
-
-    name ? (product.name = name) : product.name;
-    price ? (product.price = price) : product.price;
-    category_id ? (product.category_id = category_id) : product.category_id;
-
-    const updatedProduct = await database.query(
-      "UPDATE products SET name = $1, price = $2, category_id = $3 WHERE id = $4 RETURNING *",
-      [product.name, product.price, product.category_id, product_id]
+    const response = await database.query(
+      "UPDATE products SET name=$1, price=$2, category_id=$3 WHERE id=$4 RETURNING *",
+      [
+        data.name || uId.rows[0].name,
+        data.price || uId.rows[0].price,
+        data.category_id || uId.rows[0].category_id,
+        id,
+      ]
     );
 
-    return updatedProduct.rows[0];
-  } catch (err) {
-    throw new Error(err.message);
+    return response.rows[0];
+  } catch (error) {
+    throw new Error(error);
   }
 };
 

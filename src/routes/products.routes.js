@@ -1,15 +1,19 @@
 import { Router } from "express";
-import ProductsController from "../controllers/products.controller";
 
-const productsController = new ProductsController();
+import createProductController from "../controllers/products/createProduct.controller";
+import deleteProductController from "../controllers/products/deleteProduct.controller";
+import listProductsByCategoryController from "../controllers/products/listProductsCategory.controller";
+import listProductsController from "../controllers/products/listProducts.controller";
+import updateProductController from "../controllers/products/updateProduct.controller";
+import selectProductController from "../controllers/products/selectProduct.controller";
 
-const router = Router();
+const productRouter = Router();
 
-router.post("/", productsController.store);
-router.get("/", productsController.index);
-router.get("/:id", productsController.show);
-router.patch("/:id", productsController.update);
-router.delete("/:id", productsController.delete);
-router.get("/category/:category_id", productsController.showOneCategory);
+productRouter.post("", createProductController);
+productRouter.delete("/:id", deleteProductController);
+productRouter.patch("/:id", updateProductController);
+productRouter.get("", listProductsController);
+productRouter.get("/:id", selectProductController);
+productRouter.get("/category/:category_id", listProductsByCategoryController);
 
-export default router;
+export default productRouter;
